@@ -575,7 +575,6 @@ contains
            call endrun(msg=errMsg(sourcefile, __LINE__))    
        end if
 
-
        ! Only create new patches that have non-negligible amount of land
        if((currentPatch%area*currentPatch%disturbance_rate) > nearzero ) then
           
@@ -622,7 +621,6 @@ contains
        ! first create patch to receive primary forest area
        if ( site_areadis_primary .gt. nearzero ) then
           allocate(new_patch_primary)
-
           call create_patch(currentSite, new_patch_primary, age, &
                 site_areadis_primary, primaryforest, i_nocomp_pft)
           
@@ -2592,6 +2590,8 @@ contains
                 write(fates_log(),*) 'profile tolerance is too big, this shouldnt happen.'
                 write(fates_log(),*) 'probably this means there are too many distinct categorical '
                 write(fates_log(),*) 'patch types for the maximum number of patches'
+                write(fates_log(),*) 'what is this site?', csite%lon, csite%lat, csite%area_PFT
+                write(fates_log(),*) 'how many patches?', nopatches, maxpatches
                 call endrun(msg=errMsg(sourcefile, __LINE__))                
              endif
           else
@@ -2950,7 +2950,7 @@ contains
           write(fates_log(),*) 'disabling the endrun statement following this message.'
           write(fates_log(),*) 'FATES may or may not continue to operate within error'
           write(fates_log(),*) 'tolerances, but will generate another fail if it does not.' 
-          call endrun(msg=errMsg(sourcefile, __LINE__))
+         ! call endrun(msg=errMsg(sourcefile, __LINE__))
           
           ! Note to user. If you DO decide to remove the end-run above this line
           ! Make sure that you keep the pointer below this line, or you will get

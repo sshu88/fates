@@ -692,6 +692,9 @@ variables:
 	double fates_maintresp_model ;
 		fates_maintresp_model:units = "unitless" ;
 		fates_maintresp_model:long_name = "switch for choosing between maintenance respiration models. 1=Ryan (1991) (NOT USED)" ;
+    double fates_pprodharv10_forest_mean ;
+		fates_pprodharv10_forest_mean:units = "fraction" ;
+        fates_pprodharv10_forest_mean:long_name = "mean harvest mortality proportion of deadstem to 10-yr product (pprodharv10) of all woody PFT types." ;
 	double fates_mort_disturb_frac ;
 		fates_mort_disturb_frac:units = "fraction" ;
 		fates_mort_disturb_frac:long_name = "fraction of canopy mortality that results in disturbance (i.e. transfer of area from new to old patch)" ;
@@ -1444,6 +1447,8 @@ data:
  fates_logging_mechanical_frac = 0.05 ;
 
  fates_maintresp_model = 1 ;
+
+ fates_pprodharv10_forest_mean = 0.8125 ;
 
  fates_mort_disturb_frac = 1 ;
 
