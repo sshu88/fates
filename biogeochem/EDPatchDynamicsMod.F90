@@ -194,6 +194,9 @@ contains
     real(r8) :: harvestable_forest_c(hlm_num_lu_harvest_cats)
     real(r8) :: available_forest_c(hlm_num_lu_harvest_cats)
     integer  :: harvest_tag(hlm_num_lu_harvest_cats)
+    integer  :: harvest_debt_primary
+    integer  :: harvest_debt_secondary
+    integer  :: patch_no_secondary
 
     !----------------------------------------------------------------------------------------------
     ! Calculate Mortality Rates (these were previously calculated during growth derivatives)
@@ -207,6 +210,10 @@ contains
     call get_harvestable_carbon(site_in, bc_in%site_area, bc_in%hlm_harvest_catnames, harvestable_forest_c, available_forest_c)
  
     site_in%harvest_carbon_flux = 0._r8
+    
+    harvest_debt_primary = 0
+    harvest_debt_secondary = 0
+    patch_no_secondary = 0
 
     currentPatch => site_in%oldest_patch
     do while (associated(currentPatch))   
@@ -259,20 +266,75 @@ contains
 
           currentCohort => currentCohort%taller
        end do
+       
+       ! Determine harvest debt status from all three categories
+       ! Each cohort has the same harvest tag but not each patch
+       ! Hence this part shall be within the patch loop
+       ! TODO: we can define harvest debt as a fraction of the 
+       ! harvest rate in the future
+       ! Warning: Non-forest harvest is not accounted for yet
+       ! Thus the harvest tag for non-forest are not effective
+       if(logging_time) then
+          harvest_debt_loop: do h_index = 1, hlm_num_lu_harvest_cats
+             ! Primary patch: Once a patch has debt, skip the calculation
+             if (harvest_debt_primary == 0) then
+                if ( currentPatch%anthro_disturbance_label .eq. primaryforest ) then  
+                   if ( harvest_tag(h_index) == 2 .or. &
+                        (harvest_tag(h_index) == 1 .and. .not. (hlm_harvest_bypass_criteria))) then
+                      ! h_index points to primary forest harvest
+                      if((bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_VH1")) then
+                          harvest_debt_primary = 1
+                          exit harvest_debt_loop
+                      end if
+                   end if
+                end if
+             end if
+             ! Secondary patch
+             if (harvest_debt_secondary == 0) then
+                if ( currentPatch%anthro_disturbance_label .eq. secondaryforest ) then
+                   patch_no_secondary = patch_no_secondary + 1
+                   if ( harvest_tag(h_index) == 2 .or. &
+                        (harvest_tag(h_index) == 1 .and. .not. (hlm_harvest_bypass_criteria))) then
+                      ! h_index points to secondary forest harvest
+                      if((bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_SH1") .or. &
+                          (bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_SH2")) then
+                          harvest_debt_secondary = 1
+                          exit harvest_debt_loop
+                      end if
+                   end if
+                end if
+             end if
+          end do harvest_debt_loop
+       end if
+
        currentPatch%disturbance_mode = fates_unset_int
        currentPatch => currentPatch%younger
     end do
 
-    ! Determine harvest debt from all three categories
-    do h_index = 1, hlm_num_lu_harvest_cats
-       if (harvest_tag(h_index) == 2 .or. &
-           (harvest_tag(h_index) == 1 .and. .not. (hlm_harvest_bypass_criteria))) then
-           if(logging_time) then
-              site_in%resources_management%harvest_debt = site_in%resources_management%harvest_debt + &
-                  bc_in%hlm_harvest_rates(h_index)
-           end if
-       end if
-    end do
+    ! Obatin actual harvest debt. This shall be outside the patch loop
+    if(logging_time) then
+       do h_index = 1, hlm_num_lu_harvest_cats
+          if ( harvest_debt_primary == 1 ) then
+             ! Only account for primary forest harvest rate
+             if((bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_VH1") .or. &
+                (bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_VH2")) then
+                site_in%resources_management%harvest_debt = site_in%resources_management%harvest_debt + &
+                    bc_in%hlm_harvest_rates(h_index)
+             end if
+          end if
+          if (harvest_debt_secondary == 1 .or. patch_no_secondary == 0) then
+             ! Only account for secondary forest harvest rate
+             if((bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_SH1") .or. &
+                (bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_SH2") .or. &
+                (bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_SH3")) then
+                site_in%resources_management%harvest_debt = site_in%resources_management%harvest_debt + &
+                    bc_in%hlm_harvest_rates(h_index)
+                site_in%resources_management%harvest_debt_sec = site_in%resources_management%harvest_debt_sec + &
+                    bc_in%hlm_harvest_rates(h_index)
+             end if
+          end if
+       end do
+    end if
 
     ! ---------------------------------------------------------------------------------------------
     ! Calculate Disturbance Rates based on the mortality rates just calculated
@@ -391,7 +453,8 @@ contains
        ! ------------------------------------------------------------------------------------------
        
        ! DISTURBANCE IS LOGGING
-       if (currentPatch%disturbance_rates(dtype_ilog) > currentPatch%disturbance_rates(dtype_ifall) .and. &
+       !if (currentPatch%disturbance_rates(dtype_ilog) > currentPatch%disturbance_rates(dtype_ifall) .and. &
+       if (currentPatch%disturbance_rates(dtype_ilog) > 0.0_r8 .and. &
              currentPatch%disturbance_rates(dtype_ilog) > currentPatch%disturbance_rates(dtype_ifire) ) then 
           
           currentPatch%disturbance_rate = currentPatch%disturbance_rates(dtype_ilog)

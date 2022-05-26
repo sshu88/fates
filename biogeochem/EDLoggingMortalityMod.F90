@@ -287,7 +287,7 @@ contains
 
             if (fates_global_verbose()) then
                write(fates_log(), *) 'Successfully Read Harvest Rate from HLM.', hlm_harvest_rates(:), harvest_rate, &
-               harvestable_forest_c, available_forest_c
+                  harvestable_forest_c, available_forest_c
             end if
             !write(fates_log(),*) 'HLM harvest carbon data not implemented yet. Exiting.'
             !call endrun(msg=errMsg(sourcefile, __LINE__))
@@ -522,6 +522,8 @@ contains
         ! judge which category the current patch belong to
         ! since we have not separated forest vs. non-forest
         ! all carbon belongs to the forest categories
+        ! all harvest rate from non-forest categories are merged
+        ! into forest category
         do h_index = 1,hlm_num_lu_harvest_cats
            if (currentPatch%anthro_disturbance_label .eq. primaryforest) then
               ! Primary

@@ -28,9 +28,9 @@ module EDTypesMod
   private               ! By default everything is private
   save
 
-  integer, parameter, public :: maxPatchesPerSite  = 20   ! maximum number of patches to live on a site
+  integer, parameter, public :: maxPatchesPerSite  = 14   ! maximum number of patches to live on a site
   integer, parameter, public :: maxPatchesPerSite_by_disttype(n_anthro_disturbance_categories)  = &
-                                                     (/ 10, 10 /)  !!! MUST SUM TO maxPatchesPerSite !!!
+                                                     (/ 10, 4 /)  !!! MUST SUM TO maxPatchesPerSite !!!
   integer,  public :: maxCohortsPerPatch = 100            ! maximum number of cohorts per patch
   
   integer, parameter, public :: nclmax = 2                ! Maximum number of canopy layers
@@ -594,6 +594,8 @@ module EDTypesMod
     
      real(r8) ::  trunk_product_site                       ! Actual  trunk product at site level KgC/site
      real(r8) ::  harvest_debt                             ! the amount of kgC per site that did not successfully harvested 
+     real(r8) ::  harvest_debt_sec                         ! the amount of kgC per site from secondary patches that did 
+                                                           ! not successfully harvested 
 
      !debug variables
      real(r8) ::  delta_litter_stock                       ! kgC/site = kgC/ha
