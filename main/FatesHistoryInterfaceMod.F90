@@ -5308,7 +5308,7 @@ end subroutine update_history_hifrq
          index = ih_growth_resp_si)
 
     call this%set_history_var(vname='FATES_GROWTH_RESP_SECONDARY', units='kg m-2 s-1',   &
-         long='growth respiration in kg carbon per m2 per second',             &
+         long='growth respiration in kg carbon per m2 per second, secondary patches',             &
          use_default='active', avgflag='A', vtype=site_r8, hlms='CLM:ALM',     &
          upfreq=2, ivar=ivar, initialize=initialize_variables,                 &
          index = ih_growth_resp_secondary_si)
@@ -5320,7 +5320,7 @@ end subroutine update_history_hifrq
          index = ih_maint_resp_si)
 
     call this%set_history_var(vname='FATES_MAINT_RESP_SECONDARY', units='kg m-2 s-1',    &
-         long='maintenance respiration in kg carbon per m2 land area per second', &
+         long='maintenance respiration in kg carbon per m2 land area per second, secondary patches', &
          use_default='active', avgflag='A', vtype=site_r8, hlms='CLM:ALM',     &
          upfreq=2, ivar=ivar, initialize=initialize_variables,                 &
          index = ih_maint_resp_secondary_si)
@@ -6165,7 +6165,7 @@ end subroutine update_history_hifrq
           hlms='CLM:ALM', upfreq=1, ivar=ivar,                                 &
           initialize=initialize_variables, index = ih_mortality_canopy_si_scls)
 
-    call this%set_history_var(vname='FATES_MORTALITY_CANOPY_SZ',               &
+    call this%set_history_var(vname='FATES_MORTALITY_CANOPY_SECONDARY_SZ',               &
           units = 'm-2 yr-1',                                                  &
           long='total mortality of canopy trees by size class in number of plants per m2, secondary patches', &
           use_default='active', avgflag='A', vtype=site_size_r8,               &
