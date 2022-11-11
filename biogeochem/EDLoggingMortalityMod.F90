@@ -644,8 +644,11 @@ contains
      if (harvest_rate_supply > rsnbl_math_prec .and. harvest_rate_supply > harvest_rate_c) then
         harvest_rate = harvest_rate_c / harvest_rate_supply
      else
-        ! Force to harvest the whole cohort
-        harvest_rate = 1._r8
+        ! When force to harvest the whole cohort, patch with 0 area will be generated
+        ! but failed to be terminated in nocomp mode (because certain PFT must exist.)
+        ! I still keep the original method to avoid harvest right now.
+        !harvest_rate = 1._r8
+        harvest_rate = 0._r8
      end if
 
      ! Prevent the generation of tiny secondary patches

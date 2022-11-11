@@ -273,10 +273,8 @@ contains
     ! Harvest debt is calculated on site level
     ! TODO: we can define harvest debt as a fraction of the 
     ! harvest rate in the future
-    ! Note 1: Non-forest harvest is accounted for under forest
+    ! Note: Non-forest harvest is accounted for under forest
     ! harvest, thus the harvest tag for non-forest is not applicable (= 2)
-    ! Note 2: Since we will completely harvest all forest C from patches 
-    ! with debt, the harvest debt shall subtract the harvestable forest C
 
     if(logging_time) then
        ! First we need to get harvest rate for all three categories
@@ -297,17 +295,17 @@ contains
           if (harvest_tag(h_index) .eq. 1) then
              if(bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_VH1") then
                 site_in%resources_management%harvest_debt = site_in%resources_management%harvest_debt + &
-                    harvest_debt_pri - harvestable_forest_c(h_index)
+                    harvest_debt_pri
              else if(bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_SH1") then
                 site_in%resources_management%harvest_debt = site_in%resources_management%harvest_debt + &
-                    harvest_debt_sec_mature - harvestable_forest_c(h_index)
+                    harvest_debt_sec_mature
                 site_in%resources_management%harvest_debt_sec = site_in%resources_management%harvest_debt_sec + &
-                    harvest_debt_sec_mature - harvestable_forest_c(h_index)
+                    harvest_debt_sec_mature
              else if(bc_in%hlm_harvest_catnames(h_index) .eq. "HARVEST_SH2") then
                 site_in%resources_management%harvest_debt = site_in%resources_management%harvest_debt + &
-                    harvest_debt_sec_young - harvestable_forest_c(h_index)
+                    harvest_debt_sec_young
                 site_in%resources_management%harvest_debt_sec = site_in%resources_management%harvest_debt_sec + &
-                    harvest_debt_sec_young - harvestable_forest_c(h_index)
+                    harvest_debt_sec_young
              end if
           end if
        end do
@@ -425,10 +423,19 @@ contains
           end do
        endif
 
+       !! Print out for diagnosis
+       !if (logging_time .and. site_in%lon .eq. 50.0 .and. site_in%lat .eq. 2.0) then
+       !   write(fates_log(),*) 'Check out disturbance rates'
+       !   write(fates_log(),*) 'PFT?', currentPatch%nocomp_pft_label
+       !   write(fates_log(),*) 'Area?', currentPatch%area
+       !   write(fates_log(),*) 'disturbance rates?', currentPatch%disturbance_rates
+       !   write(fates_log(),*) 'End of the checking out.'
+
+       !end if
+
        currentPatch => currentPatch%younger
 
     enddo !patch loop 
-
   end subroutine disturbance_rates
 
     ! ============================================================================
