@@ -1795,7 +1795,7 @@ contains
         write(fates_log(),*) 'The two-stream scheme is not available yet'
         write(fates_log(),*) 'You specified fates_rad_model = ',radiation_model
         write(fates_log(),*) 'Aborting'
-        call endrun(msg=errMsg(sourcefile, __LINE__))
+       ! call endrun(msg=errMsg(sourcefile, __LINE__))
      end if
 
      if(.not.any(regeneration_model == [default_regeneration, &
